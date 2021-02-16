@@ -10,16 +10,17 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.TextInputEditText
-import kotlinx.android.synthetic.main.search_dialog_fragment.*
-import ru.ildus.translator.R
+import ru.ildus.translator.databinding.SearchDialogFragmentBinding
 import ru.ildus.translator.utils.getEmptyString
 
-class SearchDialogFragment : BottomSheetDialogFragment() {
 
+class SearchDialogFragment : BottomSheetDialogFragment() {
     private lateinit var searchEditText: TextInputEditText
     private lateinit var clearTextImageView: ImageView
     private lateinit var searchButton: TextView
     private var onSearchClickListener: OnSearchClickListener? = null
+    private var viewBinding: SearchDialogFragmentBinding? = null
+    val binding get() = viewBinding
 
     private val textWatcher = object : TextWatcher {
 
@@ -48,24 +49,37 @@ class SearchDialogFragment : BottomSheetDialogFragment() {
         onSearchClickListener = listener
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.search_dialog_fragment, container, false)
+    //    override fun onCreateView(
+//        inflater: LayoutInflater,
+//        container: ViewGroup?,
+//        savedInstanceState: Bundle?
+//    ): View? {
+//        return inflater.inflate(R.layout.search_dialog_fragment, container, false)
+//    }
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        super.onCreateView(inflater, container, savedInstanceState)
+        viewBinding = SearchDialogFragmentBinding.inflate(inflater, container, false)
+        return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        searchEditText = search_edit_text
-        clearTextImageView = clear_text_imageview
-        searchButton = search_button_textview
+        searchEditText = binding!!.searchEditText
+        clearTextImageView = binding!!.clearTextImageview
+        searchButton = binding!!.searchButtonTextview
 
         searchButton.setOnClickListener(onSearchButtonClickListener)
         searchEditText.addTextChangedListener(textWatcher)
         addOnClearClickListener()
     }
 
+
     override fun onDestroyView() {
         onSearchClickListener = null
         super.onDestroyView()
+        viewBinding = null
     }
 
     private fun addOnClearClickListener() {
@@ -76,7 +90,6 @@ class SearchDialogFragment : BottomSheetDialogFragment() {
     }
 
     interface OnSearchClickListener {
-
         fun onClick(searchWord: String)
     }
 
