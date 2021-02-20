@@ -1,22 +1,35 @@
 package ru.ildus.translator.view.main
 
 import android.os.Bundle
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.android.AndroidInjection
 import ru.ildus.translator.R
 import ru.ildus.translator.databinding.ActivityMainBinding
 import ru.ildus.translator.model.data.AppState
 import ru.ildus.translator.model.data.DataModel
-import ru.ildus.translator.presenter.MainPresenterImpl
-import ru.ildus.translator.view.FeatureContract
+import ru.ildus.translator.utils.network.isOnline
 import ru.ildus.translator.view.base.BaseActivity
 import ru.ildus.translator.view.main.adapter.MainAdapter
+import javax.inject.Inject
 
-class MainActivity : BaseActivity<AppState>() {
-    lateinit var binding: ActivityMainBinding
-    private var adapter: MainAdapter? = null
+class MainActivity : BaseActivity<AppState, MainInteractor>() {
+    @Inject
+    internal lateinit var viewModelFactory: ViewModelProvider.Factory
+    override lateinit var model: MainViewModel
+    private lateinit var binding: ActivityMainBinding
+    private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
+    private val fabClickListener: View.OnClickListener =
+        View.OnClickListener {
+            val searchDialogFragment = SearchDialogFragment.newInstance()
+            searchDialogFragment.setOnSearchClickListener(onSearchClickListener)
+            searchDialogFragment.show(supportFragmentManager, BOTTOM_SHEET_FRAGMENT_DIALOG_TAG)
+        }
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
         object : MainAdapter.OnListItemClickListener {
             override fun onItemClick(data: DataModel) {
@@ -24,40 +37,44 @@ class MainActivity : BaseActivity<AppState>() {
             }
         }
 
-    override fun createPresenter(): FeatureContract.Presenter<AppState, FeatureContract.View> {
-        return MainPresenterImpl()
-    }
+    private val onSearchClickListener: SearchDialogFragment.OnSearchClickListener =
+        object : SearchDialogFragment.OnSearchClickListener {
+            override fun onClick(searchWord: String) {
+                isNetworkAvailable = isOnline(applicationContext)
+                if (isNetworkAvailable) {
+                    model.getData(searchWord, isNetworkAvailable)
+                } else {
+                    showNoInternetConnectionDialog()
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        binding.searchFab.setOnClickListener {
-            val searchDialogFragment = SearchDialogFragment.newInstance()
-            searchDialogFragment.setOnSearchClickListener(object : SearchDialogFragment.OnSearchClickListener {
-                override fun onClick(searchWord: String) {
-                    presenter.getData(searchWord, true)
-                }
-            })
-            searchDialogFragment.show(supportFragmentManager, BOTTOM_SHEET_FRAGMENT_DIALOG_TAG)
-        }
+        model = viewModelFactory.create(MainViewModel::class.java)
+        model.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
+
+        binding.searchFab.setOnClickListener(fabClickListener)
+        binding.mainActivityRecyclerview.layoutManager = LinearLayoutManager(applicationContext)
+        binding.mainActivityRecyclerview.adapter = adapter
     }
 
     override fun renderData(appState: AppState) {
         when (appState) {
             is AppState.Success -> {
-                val dataModel = appState.data
-                if (dataModel == null || dataModel.isEmpty()) {
-                    showErrorScreen(getString(R.string.empty_server_response_on_success))
+                showViewSuccess()
+                val data = appState.data
+                if (data.isNullOrEmpty()) {
+                    showAlertDialog(
+                        getString(R.string.dialog_tittle_sorry),
+                        getString(R.string.empty_server_response_on_success)
+                    )
                 } else {
-                    showViewSuccess()
-                    if (adapter == null) {
-                        binding.mainActivityRecyclerview.layoutManager = LinearLayoutManager(applicationContext)
-                        binding.mainActivityRecyclerview.adapter = MainAdapter(onListItemClickListener, dataModel)
-                    } else {
-                        adapter!!.setData(dataModel)
-                    }
+                        adapter.setData(data)
                 }
             }
             is AppState.Loading -> {
@@ -72,38 +89,29 @@ class MainActivity : BaseActivity<AppState>() {
                 }
             }
             is AppState.Error -> {
-                showErrorScreen(appState.error.message)
+                showViewSuccess()
+                showAlertDialog(getString(R.string.error_textview_stub),appState.error.message)
             }
         }
     }
 
-    private fun showErrorScreen(error: String?) {
-        showViewError()
-        binding.errorTextview.text = (error ?: getString(R.string.undefined_error))
-        binding.reloadButton.setOnClickListener {
-            presenter.getData("hi", true)
-        }
-    }
 
     private fun showViewSuccess() {
-        binding.successLinearLayout.visibility = VISIBLE
+ //       binding.successLinearLayout.visibility = VISIBLE
         binding.loadingFrameLayout.visibility = GONE
-        binding.errorLinearLayout.visibility = GONE
+ //       binding.errorLinearLayout.visibility = GONE
     }
 
     private fun showViewLoading() {
-        binding.successLinearLayout.visibility = GONE
+ //       binding.successLinearLayout.visibility = GONE
         binding.loadingFrameLayout.visibility = VISIBLE
-        binding.errorLinearLayout.visibility = GONE
-    }
-
-    private fun showViewError() {
-        binding.successLinearLayout.visibility = GONE
-        binding.loadingFrameLayout.visibility = GONE
-        binding.errorLinearLayout.visibility = VISIBLE
+ //       binding.errorLinearLayout.visibility = GONE
     }
 
     companion object {
         private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG = "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
     }
+
+
 }
+
