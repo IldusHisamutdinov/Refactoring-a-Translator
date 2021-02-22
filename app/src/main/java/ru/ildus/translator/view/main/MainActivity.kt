@@ -6,9 +6,8 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import dagger.android.AndroidInjection
+import org.koin.android.viewmodel.ext.android.viewModel
 import ru.ildus.translator.R
 import ru.ildus.translator.databinding.ActivityMainBinding
 import ru.ildus.translator.model.data.AppState
@@ -16,12 +15,10 @@ import ru.ildus.translator.model.data.DataModel
 import ru.ildus.translator.utils.network.isOnline
 import ru.ildus.translator.view.base.BaseActivity
 import ru.ildus.translator.view.main.adapter.MainAdapter
-import javax.inject.Inject
 
 class MainActivity : BaseActivity<AppState, MainInteractor>() {
-    @Inject
-    internal lateinit var viewModelFactory: ViewModelProvider.Factory
-    override lateinit var model: MainViewModel
+
+    override val model: MainViewModel by viewModel()
     private lateinit var binding: ActivityMainBinding
     private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
     private val fabClickListener: View.OnClickListener =
@@ -50,17 +47,12 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        model = viewModelFactory.create(MainViewModel::class.java)
-        model.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
-
-        binding.searchFab.setOnClickListener(fabClickListener)
-        binding.mainActivityRecyclerview.layoutManager = LinearLayoutManager(applicationContext)
-        binding.mainActivityRecyclerview.adapter = adapter
+        iniViewModel()
+        initViews()
     }
 
     override fun renderData(appState: AppState) {
@@ -74,7 +66,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
                         getString(R.string.empty_server_response_on_success)
                     )
                 } else {
-                        adapter.setData(data)
+                    adapter.setData(data)
                 }
             }
             is AppState.Loading -> {
@@ -90,26 +82,39 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
             }
             is AppState.Error -> {
                 showViewSuccess()
-                showAlertDialog(getString(R.string.error_textview_stub),appState.error.message)
+                showAlertDialog(getString(R.string.error_textview_stub), appState.error.message)
             }
         }
     }
 
+    private fun iniViewModel() {
+        if (binding.mainActivityRecyclerview.adapter != null) {
+            throw IllegalStateException("The ViewModel should be initialised first")
+        }
+        model.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
+    }
+
+    private fun initViews() {
+        binding.searchFab.setOnClickListener(fabClickListener)
+        binding.mainActivityRecyclerview.layoutManager = LinearLayoutManager(applicationContext)
+        binding.mainActivityRecyclerview.adapter = adapter
+    }
 
     private fun showViewSuccess() {
- //       binding.successLinearLayout.visibility = VISIBLE
+        //       binding.successLinearLayout.visibility = VISIBLE
         binding.loadingFrameLayout.visibility = GONE
- //       binding.errorLinearLayout.visibility = GONE
+        //       binding.errorLinearLayout.visibility = GONE
     }
 
     private fun showViewLoading() {
- //       binding.successLinearLayout.visibility = GONE
+        //       binding.successLinearLayout.visibility = GONE
         binding.loadingFrameLayout.visibility = VISIBLE
- //       binding.errorLinearLayout.visibility = GONE
+        //       binding.errorLinearLayout.visibility = GONE
     }
 
     companion object {
-        private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG = "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
+        private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG =
+            "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
     }
 
 
