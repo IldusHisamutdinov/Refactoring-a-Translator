@@ -3,8 +3,6 @@ package ru.ildus.translator.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.Main
-import okhttp3.Dispatcher
 import ru.ildus.translator.model.data.AppState
 
 abstract class BaseViewModel<T : AppState>(

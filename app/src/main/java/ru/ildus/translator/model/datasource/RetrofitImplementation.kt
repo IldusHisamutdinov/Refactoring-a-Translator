@@ -11,7 +11,6 @@ import ru.ildus.translator.model.data.api.BaseInterceptor
 import ru.ildus.translator.view.FeatureContract
 
 class RetrofitImplementation : FeatureContract.DataSource<List<DataModel>> {
-
     override suspend fun getData(word: String): List<DataModel> {
         return getService(BaseInterceptor.interceptor).searchAsync(word).await()
     }
