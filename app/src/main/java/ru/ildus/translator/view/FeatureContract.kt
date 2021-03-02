@@ -1,42 +1,59 @@
 package ru.ildus.translator.view
 
-import ru.ildus.translator.model.data.AppState
-import ru.ildus.translator.model.data.DataModel
-import io.reactivex.Observable
-import io.reactivex.Scheduler
+import androidx.room.*
+import kotlinx.coroutines.Deferred
 import retrofit2.http.GET
 import retrofit2.http.Query
+import ru.ildus.translator.model.data.AppState
+import ru.ildus.translator.model.data.DataModel
+import ru.ildus.translator.room.HistoryEntity
 
 interface FeatureContract {
-    interface View {
-        fun renderData(appState: AppState)
-    }
-
-    interface ISchedulerProvider {
-        fun ui(): Scheduler
-        fun io(): Scheduler
-    }
-
     interface Interactor<T> {
-        fun getData(word: String, fromRemoteSource: Boolean): Observable<T>
+       suspend fun getData(word: String, fromRemoteSource: Boolean): T
     }
 
     interface Repository<T> {
-        fun getData(word: String): Observable<T>
+       suspend fun getData(word: String): T
+    }
+
+    interface RepositoryLocal<T> : Repository<T> {
+        suspend fun saveToDB(appState: AppState)
     }
 
     interface DataSource<T> {
-        fun getData(word: String): Observable<T>
+        suspend fun getData(word: String): T
     }
 
-    interface Presenter<T : AppState, V : FeatureContract.View> {
-        fun attachView(view: V)
-        fun detachView(view: V)
-        fun getData(word: String, isOnline: Boolean)
+    interface DataSourceLocal<T> : DataSource<T> {
+        suspend fun saveToDB(appState: AppState)
     }
 
     interface ApiService {
         @GET("words/search")
-        fun search(@Query("search") wordToSearch: String): Observable<List<DataModel>>
+        fun searchAsync(@Query("search") wordToSearch: String): Deferred<List<DataModel>>
     }
+
+    @Dao
+    interface HistoryDao {
+
+        @androidx.room.Query("SELECT * FROM HistoryEntity")
+        suspend fun all(): List<HistoryEntity>
+
+        @androidx.room.Query("SELECT * FROM HistoryEntity WHERE word LIKE :word")
+        suspend fun getDataByWord(word: String): HistoryEntity
+
+        @Insert(onConflict = OnConflictStrategy.IGNORE)
+        suspend fun insert(entity: HistoryEntity)
+
+        @Insert(onConflict = OnConflictStrategy.IGNORE)
+        suspend fun insertAll(entities: List<HistoryEntity>)
+
+        @Update
+        suspend fun update(entity: HistoryEntity)
+
+        @Delete
+        suspend fun delete(entity: HistoryEntity)
+    }
+
 }
