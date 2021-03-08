@@ -2,11 +2,11 @@ package ru.ildus.translator.view.history.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import ru.ildus.translator.databinding.ActivityHistoryRecyclerviewItemBinding
-import ru.ildus.translator.model.data.DataModel
-import ru.ildus.translator.utils.convertMeaningsToString
+import ru.ildus.model.data.DataModel
 
 class HistoryAdapter: RecyclerView.Adapter<HistoryAdapter.RecyclerItemViewHolder>() {
     private var data: List<DataModel> = arrayListOf()
@@ -35,11 +35,19 @@ class HistoryAdapter: RecyclerView.Adapter<HistoryAdapter.RecyclerItemViewHolder
         fun bind(data: DataModel) {
             if (layoutPosition != RecyclerView.NO_POSITION) {
                 binding.headerHistoryTextviewRecyclerItem.text = data.text
-                binding.descriptionTextviewRecyclerItem.text = convertMeaningsToString(data.meanings!!)
+       //         binding.descriptionTextviewRecyclerItem.text = data.meanings?.get(0)?.translation?.translation
+           //     binding.clearTextImageview =
                 itemView.setOnClickListener {
-                    Toast.makeText(itemView.context, "on click: ${data.text}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(itemView.context, " ${data.text}", Toast.LENGTH_SHORT).show()
                 }
+  //              addOnClearClickListener()
             }
         }
     }
+//    private fun addOnClearClickListener() {
+//         var clearTextImageView: ImageView
+//        clearTextImageView.setOnClickListener {
+//
+//        }
+//    }
 }

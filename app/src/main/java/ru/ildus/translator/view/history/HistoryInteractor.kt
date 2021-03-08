@@ -1,8 +1,8 @@
 package ru.ildus.translator.view.history
 
-import ru.ildus.translator.model.data.AppState
-import ru.ildus.translator.model.data.DataModel
-import ru.ildus.translator.view.FeatureContract
+import ru.ildus.model.data.AppState
+import ru.ildus.model.data.DataModel
+import ru.ildus.repository.FeatureContract
 
 class HistoryInteractor(
     private val repositoryRemote: FeatureContract.Repository<List<DataModel>>,
@@ -18,4 +18,5 @@ class HistoryInteractor(
             }.getData(word)
         )
     }
+
 }

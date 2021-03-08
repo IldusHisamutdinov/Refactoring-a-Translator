@@ -3,7 +3,7 @@ package ru.ildus.translator.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.*
-import ru.ildus.translator.model.data.AppState
+import ru.ildus.model.data.AppState
 
 abstract class BaseViewModel<T : AppState>(
     protected open val _mutableLiveData: MutableLiveData<T> = MutableLiveData()

@@ -4,9 +4,9 @@ import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import org.koin.android.viewmodel.ext.android.viewModel
+import ru.ildus.model.data.AppState
+import ru.ildus.model.data.DataModel
 import ru.ildus.translator.databinding.ActivityHistoryBinding
-import ru.ildus.translator.model.data.AppState
-import ru.ildus.translator.model.data.DataModel
 import ru.ildus.translator.view.base.BaseActivity
 import ru.ildus.translator.view.history.adapter.HistoryAdapter
 

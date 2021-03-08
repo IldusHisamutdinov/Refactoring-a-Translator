@@ -2,7 +2,7 @@ package ru.ildus.translator.view.history
 
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.launch
-import ru.ildus.translator.model.data.AppState
+import ru.ildus.model.data.AppState
 import ru.ildus.translator.utils.parseLocalSearchResults
 import ru.ildus.translator.viewmodel.BaseViewModel
 

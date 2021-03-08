@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ru.ildus.translator.model.data.AppState
+import ru.ildus.model.data.AppState
 import ru.ildus.translator.utils.parseOnlineSearchResults
 import ru.ildus.translator.viewmodel.BaseViewModel
 

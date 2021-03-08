@@ -3,9 +3,8 @@ package ru.ildus.translator.view.main.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import ru.ildus.model.data.DataModel
 import ru.ildus.translator.databinding.ActivityMainRecyclerviewItemBinding
-import ru.ildus.translator.model.data.DataModel
-import ru.ildus.translator.utils.convertMeaningsToString
 
 class MainAdapter(private var onListItemClickListener: OnListItemClickListener) :
     RecyclerView.Adapter<MainAdapter.RecyclerItemViewHolder>() {
@@ -35,8 +34,8 @@ class MainAdapter(private var onListItemClickListener: OnListItemClickListener) 
         fun bind(data: DataModel) {
             if (layoutPosition != RecyclerView.NO_POSITION) {
                 binding.headerTextviewRecyclerItem.text = data.text
-          //      binding.descriptionTextviewRecyclerItem.text = data.meanings?.get(0)?.translation?.translation
-                binding.descriptionTextviewRecyclerItem.text = convertMeaningsToString(data.meanings!!)
+                binding.descriptionTextviewRecyclerItem.text = data.meanings?.get(0)?.translation?.translation
+   //             binding.descriptionTextviewRecyclerItem.text = convertMeaningsToString(data.meanings!!)
                 itemView.setOnClickListener { openInNewWindow(data) }
             }
         }

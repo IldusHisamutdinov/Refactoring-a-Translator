@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -13,10 +12,10 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
-import ru.ildus.translator.AlertDialogFragment
+import ru.ildus.utils.ui.AlertDialogFragment
 import ru.ildus.translator.R
 import ru.ildus.translator.databinding.ActivityDescriptionBinding
-import ru.ildus.translator.utils.network.isOnline
+import ru.ildus.utils.network.isOnline
 
 class DescriptionActivity: AppCompatActivity() {
     private lateinit var binding: ActivityDescriptionBinding
@@ -53,7 +52,7 @@ class DescriptionActivity: AppCompatActivity() {
         if (imageLink.isNullOrBlank()) {
             stopRefreshAnimationIfNeeded()
         } else {
-            useGlideToLoadPhoto(binding.descriptionImageview, imageLink)
+            useGlideToLoadPhoto(binding.descriptionImageview, imageLink = imageLink)
         }
     }
 
@@ -78,7 +77,7 @@ class DescriptionActivity: AppCompatActivity() {
         }
     }
 
-    private fun useGlideToLoadPhoto(imageView: ImageView, imageLink: String) {
+    private fun useGlideToLoadPhoto(imageView: ru.ildus.utils.ui.EquilateralImageView, imageLink: String) {
         Glide.with(imageView)
             .load("https:$imageLink")
             .listener(object : RequestListener<Drawable> {
@@ -113,9 +112,7 @@ class DescriptionActivity: AppCompatActivity() {
     }
 
     companion object {
-
         private const val DIALOG_FRAGMENT_TAG = "8c7dff51-9769-4f6d-bbee-a3896085e76e"
-
         private const val WORD_EXTRA = "f76a288a-5dcc-43f1-ba89-7fe1d53f63b0"
         private const val DESCRIPTION_EXTRA = "0eeb92aa-520b-4fd1-bb4b-027fbf963d9a"
         private const val URL_EXTRA = "6e4b154d-e01f-4953-a404-639fb3bf7281"

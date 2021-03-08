@@ -13,10 +13,10 @@ import org.koin.android.viewmodel.ext.android.viewModel
 import ru.ildus.translator.R
 import ru.ildus.translator.databinding.ActivityMainBinding
 
-import ru.ildus.translator.model.data.AppState
-import ru.ildus.translator.model.data.DataModel
+import ru.ildus.model.data.AppState
+import ru.ildus.model.data.DataModel
 import ru.ildus.translator.utils.convertMeaningsToString
-import ru.ildus.translator.utils.network.isOnline
+import ru.ildus.utils.network.isOnline
 import ru.ildus.translator.view.base.BaseActivity
 import ru.ildus.translator.view.descriptionscreen.DescriptionActivity
 import ru.ildus.translator.view.history.HistoryActivity
@@ -25,7 +25,7 @@ import ru.ildus.translator.view.main.adapter.MainAdapter
 class MainActivity : BaseActivity<AppState, MainInteractor>() {
     override val model: MainViewModel by viewModel()
 
-    private lateinit var binding: ActivityMainBinding
+    lateinit var binding: ActivityMainBinding
     private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
     private val fabClickListener: View.OnClickListener =
         View.OnClickListener {
@@ -41,7 +41,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
                         this@MainActivity,
                         data.text!!,
                         convertMeaningsToString(data.meanings!!),
-                        data.meanings[0].imageUrl
+                        data.meanings!![0].imageUrl
                     )
                 )}
         }
@@ -98,21 +98,10 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         binding.mainActivityRecyclerview.layoutManager = LinearLayoutManager(applicationContext)
         binding.mainActivityRecyclerview.adapter = adapter
     }
-//
-//    private fun showViewSuccess() {
-//        binding.loadingFrameLayout.visibility = GONE
-//    }
-//
-//    private fun showViewLoading() {
-//        binding.loadingFrameLayout.visibility = VISIBLE
-//    }
-
 
     companion object {
         private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG =
             "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
     }
-
-
 }
 
