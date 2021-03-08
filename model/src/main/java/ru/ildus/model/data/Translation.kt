@@ -1,4 +1,4 @@
-package ru.ildus.translator.model.data
+package ru.ildus.model.data
 
 import com.google.gson.annotations.SerializedName
 
