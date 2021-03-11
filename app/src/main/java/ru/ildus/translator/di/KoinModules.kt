@@ -1,6 +1,7 @@
 package ru.ildus.translator.di
 
 import androidx.room.Room
+import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 import ru.ildus.repository.RepositoryImplementation
 import ru.ildus.repository.RepositoryImplementationLocal
@@ -14,11 +15,22 @@ import ru.ildus.translator.view.history.HistoryViewModel
 import ru.ildus.translator.view.main.MainInteractor
 import ru.ildus.translator.view.main.MainViewModel
 
+fun injectDependencies() = loadModules
+
+private val loadModules by lazy {
+    loadKoinModules(listOf(application, mainScreen, historyScreen ))
+}
+
 val application = module {
     single { Room.databaseBuilder(get(), HistoryDataBase::class.java, "HistoryDB").build() }
     single { get<HistoryDataBase>().historyDao() }
-    single<FeatureContract.Repository<List<DataModel>>> { RepositoryImplementation(RetrofitImplementation()) }
-    single<FeatureContract.RepositoryLocal<List<DataModel>>> { RepositoryImplementationLocal(RoomDataBaseImplementation(get()))
+    single<FeatureContract.Repository<List<DataModel>>> {
+        RepositoryImplementation(
+            RetrofitImplementation()
+        )
+    }
+    single<FeatureContract.RepositoryLocal<List<DataModel>>> {
+        RepositoryImplementationLocal(RoomDataBaseImplementation(get()))
     }
 }
 

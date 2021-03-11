@@ -31,6 +31,7 @@ android {
     }
     buildToolsVersion '30.0.0'
 
+    dynamicFeatures = [':descriptionscreen']
 }
 
 dependencies {
@@ -71,6 +72,9 @@ dependencies {
     implementation Room.runtime
     kapt Room.compiler
     implementation Room.room_ktx
+
+    //Google Play libraries
+    implementation GooglePlay.googlePlayCore
 
     //Test
     testImplementation TestImpl.junit

@@ -3,7 +3,7 @@ import org.gradle.api.JavaVersion
 object Config {
     const val application_id = "ru.ildus.translator"
     const val compile_sdk = 30
-    const val min_sdk = 23
+    const val min_sdk = 26
     const val target_sdk = 30
     val java_version = JavaVersion.VERSION_1_8
 }
@@ -18,6 +18,7 @@ object Modules {
     const val utils = ":utils"
     const val repository = ":repository"
     const val model = ":model"
+    const val descriptionscreen = ":descriptionscreen"
 }
 
 object Versions {
@@ -53,6 +54,9 @@ object Versions {
     const val roomKtx = "2.2.6"
     const val runtime = "2.2.6"
     const val roomCompiler = "2.2.6"
+
+    //Google Play
+    const val googlePlayCore = "1.10.0"
 
     //Test
     const val jUnit = "4.13.1"
@@ -107,4 +111,8 @@ object TestImpl {
     const val runner = "androidx.test:runner:${Versions.runner}"
     const val espresso = "androidx.test.espresso:espresso-core:${Versions.espressoCore}"
     const val constraint = "androidx.constraintlayout:constraintlayout:${Versions.constraint}"
+}
+
+object GooglePlay {
+    const val googlePlayCore = "com.google.android.play:core:${Versions.googlePlayCore}"
 }

@@ -5,25 +5,31 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.play.core.splitinstall.SplitInstallManager
+import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
+import com.google.android.play.core.splitinstall.SplitInstallRequest
 import org.koin.android.viewmodel.ext.android.viewModel
-import ru.ildus.translator.R
-import ru.ildus.translator.databinding.ActivityMainBinding
-
 import ru.ildus.model.data.AppState
 import ru.ildus.model.data.DataModel
+import ru.ildus.translator.R
+import ru.ildus.translator.databinding.ActivityMainBinding
+import ru.ildus.translator.di.injectDependencies
 import ru.ildus.translator.utils.convertMeaningsToString
-import ru.ildus.utils.network.isOnline
 import ru.ildus.translator.view.base.BaseActivity
-import ru.ildus.translator.view.descriptionscreen.DescriptionActivity
 import ru.ildus.translator.view.history.HistoryActivity
 import ru.ildus.translator.view.main.adapter.MainAdapter
+import ru.ildus.utils.network.isOnline
+
+private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG = "dialog"
+private const val DESCRIPTION_ACTIVITY_PATH = "ru.ildus.descriptionscreen.DescriptionActivity"
+private const val DESCRIPTION_ACTIVITY_FEATURE_NAME = "descriptionscreen"
 
 class MainActivity : BaseActivity<AppState, MainInteractor>() {
     override val model: MainViewModel by viewModel()
+    private lateinit var splitInstallManager: SplitInstallManager
 
     lateinit var binding: ActivityMainBinding
     private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
@@ -36,14 +42,35 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
         object : MainAdapter.OnListItemClickListener {
             override fun onItemClick(data: DataModel) {
-                startActivity(
-                    DescriptionActivity.getIntent(
-                        this@MainActivity,
-                        data.text!!,
-                        convertMeaningsToString(data.meanings!!),
-                        data.meanings!![0].imageUrl
-                    )
-                )}
+                splitInstallManager = SplitInstallManagerFactory.create(applicationContext)
+
+                val request =
+                    SplitInstallRequest
+                        .newBuilder()
+                        .addModule(DESCRIPTION_ACTIVITY_FEATURE_NAME)
+                        .build()
+
+                splitInstallManager
+                    .startInstall(request)
+                    .addOnSuccessListener {
+                        val intent = Intent().setClassName(packageName, DESCRIPTION_ACTIVITY_PATH)
+                        intent.putExtra("f76a2", data.text!!)
+                        intent.putExtra(
+                            "0eeb9", convertMeaningsToString(data.meanings!!)
+                        )
+                        intent.putExtra(
+                            "6e4b1", data.meanings!![0].imageUrl
+                        )
+                        startActivity(intent)
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(
+                            applicationContext,
+                            "Couldn't download feature: " + it.message,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+            }
         }
 
     private val onSearchClickListener: SearchDialogFragment.OnSearchClickListener =
@@ -87,9 +114,10 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     }
 
     private fun iniViewModel() {
-        if (binding.mainActivityRecyclerview.adapter != null) {
-            throw IllegalStateException("The ViewModel should be initialised first")
+        check(binding.mainActivityRecyclerview.adapter == null) {
+            "The ViewModel should be initialised first"
         }
+        injectDependencies()
         model.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
     }
 
@@ -97,11 +125,6 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         binding.searchFab.setOnClickListener(fabClickListener)
         binding.mainActivityRecyclerview.layoutManager = LinearLayoutManager(applicationContext)
         binding.mainActivityRecyclerview.adapter = adapter
-    }
-
-    companion object {
-        private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG =
-            "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
     }
 }
 
