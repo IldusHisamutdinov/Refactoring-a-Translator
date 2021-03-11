@@ -3,12 +3,13 @@ package ru.ildus.translator.view.main.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import ru.ildus.model.data.DataModel
 import ru.ildus.translator.databinding.ActivityMainRecyclerviewItemBinding
-import ru.ildus.translator.model.data.DataModel
 
-class MainAdapter(private var onListItemClickListener: OnListItemClickListener, private var data: List<DataModel>) :
+class MainAdapter(private var onListItemClickListener: OnListItemClickListener) :
     RecyclerView.Adapter<MainAdapter.RecyclerItemViewHolder>() {
-
+	
+    private var data: List<DataModel> = arrayListOf()
     fun setData(data: List<DataModel>) {
         this.data = data
         notifyDataSetChanged()
@@ -21,7 +22,7 @@ class MainAdapter(private var onListItemClickListener: OnListItemClickListener, 
     }
 
     override fun onBindViewHolder(holder: RecyclerItemViewHolder, position: Int) {
-        holder.bind(data.get(position))
+        holder.bind(data[position])
     }
 
     override fun getItemCount(): Int {
@@ -34,11 +35,12 @@ class MainAdapter(private var onListItemClickListener: OnListItemClickListener, 
             if (layoutPosition != RecyclerView.NO_POSITION) {
                 binding.headerTextviewRecyclerItem.text = data.text
                 binding.descriptionTextviewRecyclerItem.text = data.meanings?.get(0)?.translation?.translation
-
+   //             binding.descriptionTextviewRecyclerItem.text = convertMeaningsToString(data.meanings!!)
                 itemView.setOnClickListener { openInNewWindow(data) }
             }
         }
     }
+
 
     private fun openInNewWindow(listItemData: DataModel) {
         onListItemClickListener.onItemClick(listItemData)

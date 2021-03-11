@@ -1,0 +1,42 @@
+apply plugin: "com.android.dynamic-feature"
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion Config.compile_sdk
+
+    defaultConfig {
+        minSdkVersion Config.min_sdk
+        targetSdkVersion Config.target_sdk
+        versionCode Releases.version_code
+        versionName Releases.version_name
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+}
+
+dependencies {
+    implementation project(Modules.utils)
+
+    //AndroidX
+    implementation Tools.multidex
+    implementation Tools.appcompat
+
+    //Design
+    implementation Design.material
+
+    //Glide
+    implementation Glide.glide
+    kapt Glide.glide_compiler
+    implementation Glide.glide_swiper
+
+    //Test
+    testImplementation TestImpl.junit
+    androidTestImplementation TestImpl.runner
+    androidTestImplementation TestImpl.espresso
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':app')
+}

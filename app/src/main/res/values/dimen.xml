@@ -6,7 +6,7 @@
     <dimen name="margin_xx_small">5dp</dimen>
     <dimen name="margin_x_small">7dp</dimen>
     <dimen name="margin_small">10dp</dimen>
-    <dimen name="margin_medium">15dp</dimen>
+    <dimen name="margin_medium">10dp</dimen>
     <dimen name="margin_x_medium">17dp</dimen>
     <dimen name="margin_xx_medium">20dp</dimen>
     <dimen name="margin_xxx_medium">25dp</dimen>
