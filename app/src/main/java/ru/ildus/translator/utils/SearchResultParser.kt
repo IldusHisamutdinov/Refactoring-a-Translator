@@ -3,8 +3,25 @@ package ru.ildus.translator.utils
 import ru.ildus.model.data.AppState
 import ru.ildus.model.data.DataModel
 import ru.ildus.model.data.Meanings
+import ru.ildus.model.data.dto.SearchResultDto
 import ru.ildus.repository.room.HistoryEntity
+import ru.ildus.model.data.Translation
 
+fun mapSearchResultToResult(searchResults: List<SearchResultDto>): List<DataModel> {
+    return searchResults.map { searchResult ->
+        var meanings: List<Meanings> = listOf()
+        searchResult.meanings?.let {
+            //Check for null for HistoryScreen
+            meanings = it.map { meaningsDto ->
+                Meanings(
+                    Translation(meaningsDto?.translation?.translation ?: ""),
+                    meaningsDto?.imageUrl ?: ""
+                )
+            }
+        }
+        DataModel(searchResult.text ?: "", meanings)
+    }
+}
 fun parseOnlineSearchResults(state: AppState): AppState {
     return AppState.Success(mapResult(state, true))
 }

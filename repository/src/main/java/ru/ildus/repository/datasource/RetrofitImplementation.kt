@@ -7,12 +7,13 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.ildus.model.data.DataModel
+import ru.ildus.model.data.dto.SearchResultDto
 import ru.ildus.repository.FeatureContract
 
 
 
-class RetrofitImplementation : FeatureContract.DataSource<List<DataModel>> {
-    override suspend fun getData(word: String): List<DataModel> {
+class RetrofitImplementation : FeatureContract.DataSource<List<SearchResultDto>> {
+    override suspend fun getData(word: String): List<SearchResultDto> {
         return getService(ru.ildus.repository.api.BaseInterceptor.interceptor).searchAsync(word).await()
     }
 

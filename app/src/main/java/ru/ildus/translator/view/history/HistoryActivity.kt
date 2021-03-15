@@ -3,15 +3,17 @@ package ru.ildus.translator.view.history
 import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.ext.android.viewModel
 import ru.ildus.model.data.AppState
 import ru.ildus.model.data.DataModel
 import ru.ildus.translator.databinding.ActivityHistoryBinding
+import ru.ildus.translator.di.injectDependencies
 import ru.ildus.translator.view.base.BaseActivity
 import ru.ildus.translator.view.history.adapter.HistoryAdapter
 
 class HistoryActivity: BaseActivity<AppState, HistoryInteractor>() {
-    override val model: HistoryViewModel by viewModel()
+    override val model: HistoryViewModel by currentScope.inject()
     lateinit var binding: ActivityHistoryBinding
     private val adapter: HistoryAdapter by lazy { HistoryAdapter() }
 
@@ -34,9 +36,10 @@ class HistoryActivity: BaseActivity<AppState, HistoryInteractor>() {
     }
 
     private fun iniViewModel() {
-        if (binding.historyActivityRecyclerview.adapter != null) {
-            throw IllegalStateException("The ViewModel should be initialised first")
+        check (binding.historyActivityRecyclerview.adapter == null) {
+            "The ViewModel should be initialised first"
         }
+        injectDependencies()
         model.subscribe().observe(this@HistoryActivity, Observer<AppState> { renderData(it) })
     }
 

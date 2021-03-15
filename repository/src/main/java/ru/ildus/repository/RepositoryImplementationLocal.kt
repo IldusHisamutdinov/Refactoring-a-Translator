@@ -2,11 +2,12 @@ package ru.ildus.repository
 
 import ru.ildus.model.data.AppState
 import ru.ildus.model.data.DataModel
+import ru.ildus.model.data.dto.SearchResultDto
 
-class RepositoryImplementationLocal(private val dataSource: FeatureContract.DataSourceLocal<List<DataModel>>) :
-    FeatureContract.RepositoryLocal<List<DataModel>> {
+class RepositoryImplementationLocal(private val dataSource: FeatureContract.DataSourceLocal<List<SearchResultDto>>) :
+    FeatureContract.RepositoryLocal<List<SearchResultDto>> {
 
-    override suspend fun getData(word: String): List<DataModel> {
+    override suspend fun getData(word: String): List<SearchResultDto> {
         return dataSource.getData(word)
     }
 

@@ -6,6 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 import ru.ildus.model.data.AppState
 import ru.ildus.model.data.DataModel
+import ru.ildus.model.data.dto.SearchResultDto
 import ru.ildus.repository.room.HistoryEntity
 
 interface FeatureContract {
@@ -33,7 +34,7 @@ interface FeatureContract {
 
     interface ApiService {
         @GET("words/search")
-        fun searchAsync(@Query("search") wordToSearch: String): Deferred<List<DataModel>>
+        fun searchAsync(@Query("search") wordToSearch: String): Deferred<List<SearchResultDto>>
     }
 
     @Dao

@@ -2,14 +2,15 @@ package ru.ildus.repository.datasource
 
 import ru.ildus.model.data.AppState
 import ru.ildus.model.data.DataModel
+import ru.ildus.model.data.dto.SearchResultDto
 import ru.ildus.repository.FeatureContract
 import ru.ildus.repository.convertDataModelSuccessToEntity
 import ru.ildus.repository.mapHistoryEntityToSearchResult
 
 class RoomDataBaseImplementation(private val historyDao: FeatureContract.HistoryDao) :
-    FeatureContract.DataSourceLocal<List<DataModel>> {
+    FeatureContract.DataSourceLocal<List<SearchResultDto>> {
 
-    override suspend fun getData(word: String): List<DataModel> {
+    override suspend fun getData(word: String): List<SearchResultDto> {
         return mapHistoryEntityToSearchResult(historyDao.all())
     }
 

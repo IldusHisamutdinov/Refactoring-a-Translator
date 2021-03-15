@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallRequest
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.android.scope.currentScope
 import ru.ildus.model.data.AppState
 import ru.ildus.model.data.DataModel
 import ru.ildus.translator.R
@@ -21,14 +21,15 @@ import ru.ildus.translator.utils.convertMeaningsToString
 import ru.ildus.translator.view.base.BaseActivity
 import ru.ildus.translator.view.history.HistoryActivity
 import ru.ildus.translator.view.main.adapter.MainAdapter
-import ru.ildus.utils.network.isOnline
 
 private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG = "dialog"
 private const val DESCRIPTION_ACTIVITY_PATH = "ru.ildus.descriptionscreen.DescriptionActivity"
 private const val DESCRIPTION_ACTIVITY_FEATURE_NAME = "descriptionscreen"
 
-class MainActivity : BaseActivity<AppState, MainInteractor>() {
-    override val model: MainViewModel by viewModel()
+class MainActivity: BaseActivity<AppState, MainInteractor>() {
+    //override val layoutRes = R.layout.activity_main
+    override lateinit var model: MainViewModel
+ //   override val model: MainViewModel by currentScope.inject()
     private lateinit var splitInstallManager: SplitInstallManager
 
     lateinit var binding: ActivityMainBinding
@@ -54,7 +55,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
                     .startInstall(request)
                     .addOnSuccessListener {
                         val intent = Intent().setClassName(packageName, DESCRIPTION_ACTIVITY_PATH)
-                        intent.putExtra("f76a2", data.text!!)
+                        intent.putExtra("f76a2", data.text)
                         intent.putExtra(
                             "0eeb9", convertMeaningsToString(data.meanings!!)
                         )
@@ -76,11 +77,10 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     private val onSearchClickListener: SearchDialogFragment.OnSearchClickListener =
         object : SearchDialogFragment.OnSearchClickListener {
             override fun onClick(searchWord: String) {
-                isNetworkAvailable = isOnline(applicationContext)
                 if (isNetworkAvailable) {
                     model.getData(searchWord, isNetworkAvailable)
                 } else {
-                    showNoInternetConnectionDialog()
+                    showNoInternetConnectionDialog(binding.root, R.string.dialog_message_device_is_offline)
                 }
             }
         }
@@ -118,6 +118,8 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
             "The ViewModel should be initialised first"
         }
         injectDependencies()
+        val viewModel: MainViewModel by currentScope.inject()
+        model = viewModel
         model.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
     }
 
