@@ -27,9 +27,7 @@ private const val DESCRIPTION_ACTIVITY_PATH = "ru.ildus.descriptionscreen.Descri
 private const val DESCRIPTION_ACTIVITY_FEATURE_NAME = "descriptionscreen"
 
 class MainActivity: BaseActivity<AppState, MainInteractor>() {
-    //override val layoutRes = R.layout.activity_main
     override lateinit var model: MainViewModel
- //   override val model: MainViewModel by currentScope.inject()
     private lateinit var splitInstallManager: SplitInstallManager
 
     lateinit var binding: ActivityMainBinding
@@ -80,7 +78,7 @@ class MainActivity: BaseActivity<AppState, MainInteractor>() {
                 if (isNetworkAvailable) {
                     model.getData(searchWord, isNetworkAvailable)
                 } else {
-                    showNoInternetConnectionDialog(binding.root, R.string.dialog_message_device_is_offline)
+                    showNoInternetConnectionDialog()
                 }
             }
         }

@@ -2,22 +2,21 @@ package ru.ildus.translator.view.base
 
 import android.graphics.Color
 import android.os.Bundle
-import android.view.View
-import android.view.View.VISIBLE
+import android.view.Gravity
 import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
-import org.koin.android.viewmodel.ext.android.getViewModel
 import ru.ildus.utils.ui.AlertDialogFragment
 import ru.ildus.translator.R
 import ru.ildus.model.data.AppState
 import ru.ildus.model.data.DataModel
 import ru.ildus.repository.FeatureContract
+
 import ru.ildus.translator.viewmodel.BaseViewModel
 import ru.ildus.utils.network.OnlineLiveData
 import ru.ildus.utils.ui.viewById
@@ -26,7 +25,7 @@ private const val DIALOG_FRAGMENT_TAG = "74a54328-5d62-46bf-ab6b-cbf5d8c79522"
 
 abstract class BaseActivity<T : AppState, I : FeatureContract.Interactor<T>> : AppCompatActivity() {
     protected abstract val model: BaseViewModel<T>
-    private var viewSnack: Snackbar? = null
+    protected var viewSnack: Snackbar? = null
     protected var isNetworkAvailable: Boolean = true
 
     val progressBarHorizontal by viewById<ProgressBar>(R.id.progress_bar_horizontal)
@@ -41,7 +40,7 @@ abstract class BaseActivity<T : AppState, I : FeatureContract.Interactor<T>> : A
     override fun onResume() {
         super.onResume()
         if (!isNetworkAvailable && isDialogNull()) {
-            viewSnack
+            viewSnack?.dismiss()
         }
     }
 
@@ -78,17 +77,30 @@ abstract class BaseActivity<T : AppState, I : FeatureContract.Interactor<T>> : A
         }
     }
 
-    protected fun showNoInternetConnectionDialog(view: View, messageText: Int ) {
-        viewSnack(view,
-            getString(R.string.dialog_message_device_is_offline)
-        )
+    protected fun showNoInternetConnectionDialog() {
+        showNetworkMessage()
     }
 
-    fun viewSnack(view: View, messageText: String?) {
-        viewSnack = Snackbar.make(view, messageText?: "" , Snackbar.LENGTH_INDEFINITE)
-            .setAction( "clear") { viewSnack?.dismiss() }
-        viewSnack!!.setBackgroundTint(Color.LTGRAY)
-        viewSnack!!.show()
+    private fun dismissNetworkMessage() {
+        viewSnack?.dismiss()
+    }
+
+    fun showNetworkMessage() {
+        val viewSnack =
+            Snackbar.make(findViewById(android.R.id.content), "", Snackbar.LENGTH_INDEFINITE)
+                .setAction("clear") { }
+        viewSnack.setBackgroundTint(Color.LTGRAY)
+        viewSnack.setTextColor(Color.RED)
+        viewSnack.setMaxInlineActionWidth(1)
+        viewSnack.setText(R.string.dialog_message_device_is_offline)
+        val view = viewSnack.view
+        val params = view.layoutParams as FrameLayout.LayoutParams
+        params.gravity = Gravity.TOP
+        view.layoutParams = params
+        val textView =
+            view.findViewById(com.google.android.material.R.id.snackbar_text) as TextView
+        textView.textSize = 16f
+        viewSnack.show()
     }
 
     protected fun showAlertDialog(title: String?, message: String?) {
@@ -113,11 +125,10 @@ abstract class BaseActivity<T : AppState, I : FeatureContract.Interactor<T>> : A
             this@BaseActivity, Observer<Boolean> {
                 isNetworkAvailable = it
                 if (!isNetworkAvailable) {
-//                    Toast.makeText(
-//                        this@BaseActivity,
-//                        R.string.dialog_message_device_is_offline,
-//                        Toast.LENGTH_LONG
-//                    ).show()
+                    showNetworkMessage()
+                } else {
+                    if (viewSnack != null)
+                        dismissNetworkMessage()
                 }
             }
         )
@@ -125,4 +136,3 @@ abstract class BaseActivity<T : AppState, I : FeatureContract.Interactor<T>> : A
 
     abstract fun setDataToAdapter(data: List<DataModel>)
 }
-
