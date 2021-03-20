@@ -1,10 +1,14 @@
 package ru.ildus.translator.view.main
 
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.View.*
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,18 +30,19 @@ private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG = "dialog"
 private const val DESCRIPTION_ACTIVITY_PATH = "ru.ildus.descriptionscreen.DescriptionActivity"
 private const val DESCRIPTION_ACTIVITY_FEATURE_NAME = "descriptionscreen"
 
-class MainActivity: BaseActivity<AppState, MainInteractor>() {
+class MainActivity : BaseActivity<AppState, MainInteractor>() {
     override lateinit var model: MainViewModel
     private lateinit var splitInstallManager: SplitInstallManager
-
     lateinit var binding: ActivityMainBinding
     private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
+
     private val fabClickListener: View.OnClickListener =
         View.OnClickListener {
             val searchDialogFragment = SearchDialogFragment.newInstance()
             searchDialogFragment.setOnSearchClickListener(onSearchClickListener)
             searchDialogFragment.show(supportFragmentManager, BOTTOM_SHEET_FRAGMENT_DIALOG_TAG)
         }
+
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
         object : MainAdapter.OnListItemClickListener {
             override fun onItemClick(data: DataModel) {
@@ -92,12 +97,32 @@ class MainActivity: BaseActivity<AppState, MainInteractor>() {
         initViews()
     }
 
+
+    override fun onResume() {
+        super.onResume()
+        openFirstActivity(loadSharedPrefs())
+    }
+
+    private fun loadSharedPrefs(): String =
+        getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE)
+            .getString(Constants.WORD_KEY, "word").toString()
+
+    fun openFirstActivity(searchWord: String) {
+        if (isNetworkAvailable) {
+            model.getData(searchWord, isNetworkAvailable)
+        } else {
+            showNoInternetConnectionDialog()
+        }
+    }
+
     override fun setDataToAdapter(data: List<DataModel>) {
         adapter.setData(data)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.history_menu, menu)
+        menu?.findItem(R.id.menu_screen_settings)?.isVisible =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -105,6 +130,10 @@ class MainActivity: BaseActivity<AppState, MainInteractor>() {
         return when (item.itemId) {
             R.id.menu_history -> {
                 startActivity(Intent(this, HistoryActivity::class.java))
+                true
+            }
+            R.id.menu_screen_settings -> {
+                startActivityForResult(Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY), 42)
                 true
             }
             else -> super.onOptionsItemSelected(item)
