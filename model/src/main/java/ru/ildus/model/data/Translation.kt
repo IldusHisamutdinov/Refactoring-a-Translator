@@ -2,7 +2,7 @@ package ru.ildus.model.data
 
 import com.google.gson.annotations.SerializedName
 
-class Translation(
+ data class Translation(
     @field:SerializedName("text")
-    val translation: String?
+    val translation: String = ""
 )

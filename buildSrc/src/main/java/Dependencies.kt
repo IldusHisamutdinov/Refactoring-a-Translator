@@ -2,9 +2,9 @@ import org.gradle.api.JavaVersion
 
 object Config {
     const val application_id = "ru.ildus.translator"
-    const val compile_sdk = 30
+    const val compile_sdk = 29
     const val min_sdk = 26
-    const val target_sdk = 30
+    const val target_sdk = 29
     val java_version = JavaVersion.VERSION_1_8
 }
 

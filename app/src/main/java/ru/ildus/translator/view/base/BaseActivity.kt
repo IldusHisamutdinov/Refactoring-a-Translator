@@ -11,14 +11,13 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
-import ru.ildus.utils.ui.AlertDialogFragment
-import ru.ildus.translator.R
 import ru.ildus.model.data.AppState
 import ru.ildus.model.data.DataModel
 import ru.ildus.repository.FeatureContract
-
+import ru.ildus.translator.R
 import ru.ildus.translator.viewmodel.BaseViewModel
 import ru.ildus.utils.network.OnlineLiveData
+import ru.ildus.utils.ui.AlertDialogFragment
 import ru.ildus.utils.ui.viewById
 
 private const val DIALOG_FRAGMENT_TAG = "74a54328-5d62-46bf-ab6b-cbf5d8c79522"
@@ -72,7 +71,7 @@ abstract class BaseActivity<T : AppState, I : FeatureContract.Interactor<T>> : A
             }
             is AppState.Error -> {
                 showViewWorking()
-                showAlertDialog(getString(R.string.error_textview_stub), appState.error.message)
+                showNoInternetConnectionDialog()
             }
         }
     }
@@ -81,26 +80,23 @@ abstract class BaseActivity<T : AppState, I : FeatureContract.Interactor<T>> : A
         showNetworkMessage()
     }
 
-    private fun dismissNetworkMessage() {
+    fun dismissNetworkMessage() {
         viewSnack?.dismiss()
     }
 
     fun showNetworkMessage() {
-        val viewSnack =
+        viewSnack =
             Snackbar.make(findViewById(android.R.id.content), "", Snackbar.LENGTH_INDEFINITE)
-                .setAction("clear") { }
-        viewSnack.setBackgroundTint(Color.LTGRAY)
-        viewSnack.setTextColor(Color.RED)
-        viewSnack.setMaxInlineActionWidth(1)
-        viewSnack.setText(R.string.dialog_message_device_is_offline)
-        val view = viewSnack.view
-        val params = view.layoutParams as FrameLayout.LayoutParams
+                .setAction("далее") { }
+    viewSnack?.setBackgroundTint(Color.LTGRAY)?.setTextColor(Color.RED)?.setMaxInlineActionWidth(1)?.setText(R.string.dialog_message_device_is_offline)
+        val view = viewSnack?.view
+        val params = view?.layoutParams as FrameLayout.LayoutParams
         params.gravity = Gravity.TOP
         view.layoutParams = params
         val textView =
             view.findViewById(com.google.android.material.R.id.snackbar_text) as TextView
         textView.textSize = 16f
-        viewSnack.show()
+        viewSnack?.show()
     }
 
     protected fun showAlertDialog(title: String?, message: String?) {
@@ -120,7 +116,7 @@ abstract class BaseActivity<T : AppState, I : FeatureContract.Interactor<T>> : A
         return supportFragmentManager.findFragmentByTag(DIALOG_FRAGMENT_TAG) == null
     }
 
-    private fun subscribeToNetworkChange() {
+    fun subscribeToNetworkChange() {
         OnlineLiveData(this).observe(
             this@BaseActivity, Observer<Boolean> {
                 isNetworkAvailable = it

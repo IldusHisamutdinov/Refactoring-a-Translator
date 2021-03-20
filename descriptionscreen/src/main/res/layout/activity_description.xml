@@ -46,6 +46,6 @@
                 android:visibility="visible"
                 tools:visibility="visible"
                 android:contentDescription="@string/image_stub"
-            tools:ignore="MissingClass" />
+             />
     </LinearLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

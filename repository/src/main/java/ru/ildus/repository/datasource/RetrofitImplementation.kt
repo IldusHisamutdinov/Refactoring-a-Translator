@@ -10,8 +10,6 @@ import ru.ildus.model.data.DataModel
 import ru.ildus.model.data.dto.SearchResultDto
 import ru.ildus.repository.FeatureContract
 
-
-
 class RetrofitImplementation : FeatureContract.DataSource<List<SearchResultDto>> {
     override suspend fun getData(word: String): List<SearchResultDto> {
         return getService(ru.ildus.repository.api.BaseInterceptor.interceptor).searchAsync(word).await()
@@ -43,3 +41,5 @@ class RetrofitImplementation : FeatureContract.DataSource<List<SearchResultDto>>
         private const val BASE_URL_LOCATIONS = "https://dictionary.skyeng.ru/api/public/v1/"
     }
 }
+
+

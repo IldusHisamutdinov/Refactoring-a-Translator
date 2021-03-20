@@ -1,6 +1,5 @@
 package ru.ildus.repository
 
-import ru.ildus.model.data.DataModel
 import ru.ildus.model.data.dto.SearchResultDto
 
 class RepositoryImplementation(private val dataSource: FeatureContract.DataSource<List<SearchResultDto>>) :

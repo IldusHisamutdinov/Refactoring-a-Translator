@@ -2,7 +2,6 @@ package ru.ildus.repository
 
 import ru.ildus.repository.room.HistoryEntity
 import ru.ildus.model.data.AppState
-import ru.ildus.model.data.DataModel
 import ru.ildus.model.data.dto.SearchResultDto
 
 fun mapHistoryEntityToSearchResult(list: List<HistoryEntity>): List<SearchResultDto> {

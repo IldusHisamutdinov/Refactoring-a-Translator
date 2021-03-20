@@ -9,10 +9,9 @@ class AlertDialogFragment : AppCompatDialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val context = activity
         var alertDialog = getStubAlertDialog(context!!)
-        val args = arguments
-        if (args != null) {
-            val title = args.getString(TITLE_EXTRA)
-            val message = args.getString(MESSAGE_EXTRA)
+        arguments?.let {
+            val title = it.getString(TITLE_EXTRA)
+            val message = it.getString(MESSAGE_EXTRA)
             alertDialog = getAlertDialog(context, title, message)
         }
         return alertDialog
@@ -25,10 +24,10 @@ class AlertDialogFragment : AppCompatDialogFragment() {
 
         fun newInstance(title: String?, message: String?): AlertDialogFragment {
             val dialogFragment = AlertDialogFragment()
-            val args = Bundle()
-            args.putString(TITLE_EXTRA, title)
-            args.putString(MESSAGE_EXTRA, message)
-            dialogFragment.arguments = args
+            dialogFragment.arguments = Bundle().apply {
+                putString(TITLE_EXTRA, title)
+                putString(MESSAGE_EXTRA, message)
+            }
             return dialogFragment
         }
     }

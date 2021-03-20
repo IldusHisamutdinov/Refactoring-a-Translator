@@ -1,7 +1,6 @@
 package ru.ildus.repository.datasource
 
 import ru.ildus.model.data.AppState
-import ru.ildus.model.data.DataModel
 import ru.ildus.model.data.dto.SearchResultDto
 import ru.ildus.repository.FeatureContract
 import ru.ildus.repository.convertDataModelSuccessToEntity

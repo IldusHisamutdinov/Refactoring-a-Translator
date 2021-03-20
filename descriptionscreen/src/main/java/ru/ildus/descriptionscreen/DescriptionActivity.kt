@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -13,9 +14,9 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import ru.ildus.descriptionscreen.databinding.ActivityDescriptionBinding
-import ru.ildus.utils.ui.AlertDialogFragment
 import ru.ildus.translator.R
-import ru.ildus.utils.network.isOnline
+import ru.ildus.utils.network.OnlineLiveData
+import ru.ildus.utils.ui.AlertDialogFragment
 
 class DescriptionActivity: AppCompatActivity() {
     private lateinit var binding: ActivityDescriptionBinding
@@ -53,23 +54,27 @@ class DescriptionActivity: AppCompatActivity() {
         if (imageLink.isNullOrBlank()) {
             stopRefreshAnimationIfNeeded()
         } else {
-            useGlideToLoadPhoto(binding.descriptionImageview, imageLink = imageLink)
+            useGlideToLoadPhoto(binding.descriptionImageview, imageLink)
         }
     }
 
     private fun startLoadingOrShowError() {
-        if (isOnline(applicationContext)) {
-            setData()
-        } else {
-            AlertDialogFragment.newInstance(
-                getString(R.string.dialog_title_device_is_offline),
-                getString(R.string.dialog_message_device_is_offline)
-            ).show(
-                supportFragmentManager,
-                DIALOG_FRAGMENT_TAG
-            )
-            stopRefreshAnimationIfNeeded()
-        }
+        OnlineLiveData(this).observe(
+            this@DescriptionActivity,
+            Observer<Boolean> {
+                if (it) {
+                    setData()
+                } else {
+                    AlertDialogFragment.newInstance(
+                        getString(R.string.dialog_title_device_is_offline),
+                        getString(R.string.dialog_message_device_is_offline)
+                    ).show(
+                        supportFragmentManager,
+                        DIALOG_FRAGMENT_TAG
+                    )
+                    stopRefreshAnimationIfNeeded()
+                }
+            })
     }
 
     private fun stopRefreshAnimationIfNeeded() {

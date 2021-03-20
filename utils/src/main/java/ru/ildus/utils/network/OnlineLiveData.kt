@@ -10,6 +10,7 @@ class OnlineLiveData(context: Context): LiveData<Boolean>() {
     private val availableNetworks = mutableSetOf<Network>()
     private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val request: NetworkRequest = NetworkRequest.Builder().build()
+
     private val callback = object: ConnectivityManager.NetworkCallback() {
 
         override fun onLost(network: Network) {
@@ -36,4 +37,5 @@ class OnlineLiveData(context: Context): LiveData<Boolean>() {
             postValue(online)
         }
     }
+
 }
