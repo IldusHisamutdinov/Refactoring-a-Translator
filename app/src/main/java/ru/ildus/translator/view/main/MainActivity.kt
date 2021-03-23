@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.View.*
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.play.core.splitinstall.SplitInstallManager
@@ -35,9 +36,10 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     private lateinit var splitInstallManager: SplitInstallManager
     lateinit var binding: ActivityMainBinding
     private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
+    private val sharedPref by getSharedPref()
 
-    private val fabClickListener: View.OnClickListener =
-        View.OnClickListener {
+    private val fabClickListener: OnClickListener =
+        OnClickListener {
             val searchDialogFragment = SearchDialogFragment.newInstance()
             searchDialogFragment.setOnSearchClickListener(onSearchClickListener)
             searchDialogFragment.show(supportFragmentManager, BOTTOM_SHEET_FRAGMENT_DIALOG_TAG)
@@ -82,6 +84,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
             override fun onClick(searchWord: String) {
                 if (isNetworkAvailable) {
                     model.getData(searchWord, isNetworkAvailable)
+                    sharedPref.searchWord = searchWord
                 } else {
                     showNoInternetConnectionDialog()
                 }
@@ -97,15 +100,10 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         initViews()
     }
 
-
     override fun onResume() {
         super.onResume()
-        openFirstActivity(loadSharedPrefs())
+        openFirstActivity(sharedPref.searchWord)
     }
-
-    private fun loadSharedPrefs(): String =
-        getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE)
-            .getString(Constants.WORD_KEY, "word").toString()
 
     fun openFirstActivity(searchWord: String) {
         if (isNetworkAvailable) {
@@ -126,6 +124,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_history -> {
