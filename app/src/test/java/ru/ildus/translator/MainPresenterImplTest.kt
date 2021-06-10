@@ -18,12 +18,8 @@ import ru.ildus.translator.view.main.MainInteractor
 class MainPresenterImplTest {
 
     private lateinit var presenter: MainPresenterImpl<AppState, FeatureContract.View>
+  
 
-    @Mock
-    private lateinit var T : AppState
-
-
-    //   private lateinit var V : FeatureContract.View
     private lateinit var currentView: FeatureContract.View
 
     @Mock
@@ -36,11 +32,8 @@ class MainPresenterImplTest {
     private lateinit var schedulerProvider: SchedulerProvider
 
     @Before
-    fun setUp() {
-        //Обязательно для аннотаций "@Mock"
-        //Раньше было @RunWith(MockitoJUnitRunner.class) в аннотации к самому классу (SearchPresenterTest)
-        MockitoAnnotations.initMocks(this)
-        //Создаем Презентер, используя моки Репозитория и Вью, проинициализированные строкой выше
+    fun setUp() {    
+        MockitoAnnotations.initMocks(this)     
         presenter = MainPresenterImpl(interactor, compositeDisposable, schedulerProvider)
     }
 
