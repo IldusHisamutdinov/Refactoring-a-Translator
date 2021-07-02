@@ -55,6 +55,25 @@ class MainActivityRecyclerTest {
                 )
 
     }
+    //клик на элемент списка, всплывает Toast слова
+    @Test
+    fun activitySearch_PerformClickAtPosition() {
+
+        loadList()
+        uiDevice.wait(
+            Until.findObject(By.res(packageName, "totalCountTextView")),
+            TIMEOUT
+        )
+        Espresso.onView(withId(R.id.main_activity_recyclerview))
+            .perform(
+                RecyclerViewActions.actionOnItemAtPosition<MainAdapter.RecyclerItemViewHolder>(
+                    5,
+                    ViewActions.click()
+                )
+            )
+
+    }
+
     private fun loadList() {
         Espresso.onView(withId(R.id.search_fab)).perform(ViewActions.click())
         Espresso.onView(withId(R.id.search_edit_text))
@@ -62,6 +81,8 @@ class MainActivityRecyclerTest {
         Espresso.onView(withId(R.id.search_edit_text)).perform(ViewActions.pressImeActionButton())
         Espresso.onView(withId(R.id.search_button_textview)).perform(ViewActions.click())
     }
+
+
 
     @After
     fun close() {
